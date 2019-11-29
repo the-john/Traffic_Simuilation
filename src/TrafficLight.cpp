@@ -12,8 +12,9 @@ T MessageQueue<T>::receive()
     // to wait for and receive new messages and pull them from the queue using move semantics. 
     // The received object should then be returned by the receive function. 
 }
-
-template <typename T>
+*/
+//template <typename T>
+/*
 void MessageQueue<T>::send(T &&msg)
 {
     // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex> 
@@ -23,11 +24,13 @@ void MessageQueue<T>::send(T &&msg)
 
 /* Implementation of class "TrafficLight" */
 
-/* 
 TrafficLight::TrafficLight()
 {
     _currentPhase = TrafficLightPhase::red;
 }
+
+TrafficLight::~TrafficLight() {}
+
 
 void TrafficLight::waitForGreen()
 {
@@ -36,15 +39,23 @@ void TrafficLight::waitForGreen()
     // Once it receives TrafficLightPhase::green, the method returns.
 }
 
+
 TrafficLightPhase TrafficLight::getCurrentPhase()
 {
     return _currentPhase;
 }
 
+void TrafficLight::setCurrentPhase(TrafficLightPhase phase)
+{
+    _currentPhase = phase;
+}
+
+
 void TrafficLight::simulate()
 {
     // FP.2b : Finally, the private method „cycleThroughPhases“ should be started in a thread when the public method „simulate“ is called. To do this, use the thread queue in the base class. 
 }
+
 
 // virtual function which is executed in a thread
 void TrafficLight::cycleThroughPhases()
@@ -55,4 +66,3 @@ void TrafficLight::cycleThroughPhases()
     // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles. 
 }
 
-*/
