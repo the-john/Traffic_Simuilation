@@ -79,21 +79,28 @@ void Intersection::addVehicleToQueue(std::shared_ptr<Vehicle> vehicle)
     // add new vehicle to the end of the waiting line
     std::promise<void> prmsVehicleAllowedToEnter;
     std::future<void> ftrVehicleAllowedToEnter = prmsVehicleAllowedToEnter.get_future();
-    _waitingVehicles.pushBack(vehicle, std::move(prmsVehicleAllowedToEnter));
+    //_waitingVehicles.pushBack(vehicle, std::move(prmsVehicleAllowedToEnter));
 
     // wait until the vehicle is allowed to enter
-    ftrVehicleAllowedToEnter.wait();
-    lck.lock();
-    std::cout << "Intersection #" << _id << ": Vehicle #" << vehicle->getID() << " is granted entry." << std::endl;
+    //ftrVehicleAllowedToEnter.wait();
+    //lck.lock();
+    //std::cout << "Intersection #" << _id << ": Vehicle #" << vehicle->getID() << " is granted entry." << std::endl;
     
     // FP.6b : use the methods TrafficLight::getCurrentPhase and TrafficLight::waitForGreen to block the execution until the traffic light turns green.
+    if (!trafficLightIsGreen()) {
+        _trafficLight.waitForGreen();
+    }
+    _waitingVehicles.pushBack(vehicle, std::move(prmsVehicleAllowedToEnter));
 
+    ftrVehicleAllowedToEnter.wait();
+    lck.lock();
+    std::cout << "Intersection Number" << _id << ": Vehicle Number" << vehicle -> getID() << " can enter now." << std::endl;
     lck.unlock();
 }
 
 void Intersection::vehicleHasLeft(std::shared_ptr<Vehicle> vehicle)
 {
-    //std::cout << "Intersection #" << _id << ": Vehicle #" << vehicle->getID() << " has left." << std::endl;
+    std::cout << "Intersection #" << _id << ": Vehicle #" << vehicle->getID() << " has left." << std::endl;
 
     // unblock queue processing
     this->setIsBlocked(false);
@@ -102,7 +109,7 @@ void Intersection::vehicleHasLeft(std::shared_ptr<Vehicle> vehicle)
 void Intersection::setIsBlocked(bool isBlocked)
 {
     _isBlocked = isBlocked;
-    //std::cout << "Intersection #" << _id << " isBlocked=" << isBlocked << std::endl;
+    std::cout << "Intersection #" << _id << " isBlocked=" << isBlocked << std::endl;
 }
 
 // virtual function which is executed in a thread
@@ -112,12 +119,13 @@ void Intersection::simulate() // using threads + promises/futures + exceptions
 
     // launch vehicle queue processing in a thread
     threads.emplace_back(std::thread(&Intersection::processVehicleQueue, this));
+    _trafficLight.simulate();
 }
 
 void Intersection::processVehicleQueue()
 {
     // print id of the current thread
-    //std::cout << "Intersection #" << _id << "::processVehicleQueue: thread id = " << std::this_thread::get_id() << std::endl;
+    std::cout << "Intersection #" << _id << "::processVehicleQueue: thread id = " << std::this_thread::get_id() << std::endl;
 
     // continuously process the vehicle queue
     while (true)
@@ -140,12 +148,12 @@ void Intersection::processVehicleQueue()
 bool Intersection::trafficLightIsGreen()
 {
    // please include this part once you have solved the final project tasks
-   /*
+   
    if (_trafficLight.getCurrentPhase() == TrafficLightPhase::green)
        return true;
    else
        return false;
-   */
+   
 
-  return true; // makes traffic light permanently green
+  //return true; // makes traffic light permanently green
 } 
