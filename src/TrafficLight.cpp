@@ -79,21 +79,24 @@ void TrafficLight::cycleThroughPhases()
     // and toggles the current phase of the traffic light between red and green and sends an update method 
     // to the message queue using move semantics. The cycle duration should be a random value between 4 and 6 seconds. 
     // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles. 
-    srand(time(NULL));                                                                                  // seed the random number generator
-
-    int duration = (rand()%(6 - 4 +1)) + 4;                                                             // generate a random number between 4 and 6
+    
+    //srand(time(0));                                                                                     // seed the random number generator
+                                                                                                          // https://www.geeksforgeeks.org/generating-random-number-range-c/
+    //float duration = (rand()%(6 - 4 +1)) + 4;                                                           // generate a random number between 4 and 6
+    //duration = duration * 1000;                                                                         // turn it into seconds
+    
+    // NOTE:  Thanks to feedback from my reviewer, there is a better way to generate random numbers (longer period and better statistical behavior) than rand()
+    std::random_device seed;                                                                            // create a seed for the random number engine
+    std::mt19937 gen(seed());                                                                           // generate random number with seed & Mersenne Twister
+    std::uniform_real_distribution<double> dis(4.0, 6.0);                                               // set between 4 and 6
+    double duration = dis(gen);                                                                         // define and set duration
     duration = duration * 1000;                                                                         // turn it into seconds
+        
     std::chrono::time_point<std::chrono::system_clock> lastUpdate;                                      // get the current system time
     lastUpdate = std::chrono::system_clock::now();                                                      // make lastUpdate now
 
     while (true) {                                                                                      // infinite loop
         std::this_thread::sleep_for(std::chrono::milliseconds(1));                                      // wait between cycles as per Task list
-
-        //int random_number;
-        //random_number = (rand()%(6 - 4 +1)) + 4;                                                        // randomly pick a number between 4 and 6 
-                                                                                                          // https://www.geeksforgeeks.org/generating-random-number-range-c/
-        //std::this_thread::sleep_for(std::chrono::milliseconds(random_number * 1000));                   // Pause for random_number of seconds
-        
         int timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
         if (timeDifference >= duration) {
 
